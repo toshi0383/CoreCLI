@@ -84,7 +84,7 @@ extension <%= type.name %> {
         <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "String?" { -%>
         <%_ if variable.annotations["shift"] == nil { -%>
-        self.<%= variable.name %> = try getOptionValue(keyPath: \Base.<%= variable.name %>)
+        self.<%= variable.name %> = try? getOptionValue(keyPath: \Base.<%= variable.name %>)
         <%_ } else { -%>
         guard let shifted = parser.shift() else {
             throw CommandError("Missing <%= variable.name %> parameter.")
