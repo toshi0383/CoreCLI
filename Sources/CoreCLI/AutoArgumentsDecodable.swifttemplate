@@ -70,41 +70,39 @@ extension <%= type.name %> {
         }
 
         <%_ for variable in type.storedVariables { -%>
+        <%_ if variable.annotations["shift"] == nil { -%>
         <%_ if variable.typeName.name == "String" { -%>
-        <%_ if variable.annotations["shift"] == nil { -%>
         self.<%= variable.name %> = try getOptionValue(keyPath: \Base.<%= variable.name %>)
-        <%_ } else { -%>
-        guard let shifted = parser.shift() else {
-            throw CommandError("Missing <%= variable.name %> parameter.")
-        }
-        self.<%= variable.name %> = shifted
         <%_ } -%>
-        <%_ } -%>
-        <%_ } -%>
-        <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "String?" { -%>
-        <%_ if variable.annotations["shift"] == nil { -%>
         self.<%= variable.name %> = try? getOptionValue(keyPath: \Base.<%= variable.name %>)
-        <%_ } else { -%>
-        guard let shifted = parser.shift() else {
-            throw CommandError("Missing <%= variable.name %> parameter.")
-        }
-        self.<%= variable.name %> = shifted
         <%_ } -%>
         <%_ } -%>
-        <%_ } -%>
-        <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "Bool" { -%>
         self.<%= variable.name %> = getFlag(keyPath: \Base.<%= variable.name %>)
         <%_ } -%>
-        <%_ } -%>
-        <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "CommandType?" { -%>
         if let type = getCommandType() {
             self.<%= variable.name %> = try type.init(parser: parser)
         } else {
             self.<%= variable.name %> = nil
         }
+        <%_ } -%>
+        <%_ } -%>
+        <%_ for variable in type.storedVariables { -%>
+        <%_ if variable.annotations["shift"] != nil { -%>
+        <%_ if variable.typeName.name == "String" { -%>
+        guard let shifted = parser.shift() else {
+            throw CommandError("Missing <%= variable.name %> parameter.")
+        }
+        self.<%= variable.name %> = shifted
+        <%_ } -%>
+        <%_ if variable.typeName.name == "String?" { -%>
+        guard let shifted = parser.shift() else {
+            throw CommandError("Missing <%= variable.name %> parameter.")
+        }
+        self.<%= variable.name %> = shifted
+        <%_ } -%>
         <%_ } -%>
         <%_ } -%>
     }
