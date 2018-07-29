@@ -34,6 +34,7 @@ extension <%= type.name %> {
         ]
     }
 
+    <%_ if !type.initializers.contains(where: { $0.name.contains("init(parser)") }) { -%>
     init(parser: ArgumentParserType) throws {
 
         func getOptionValue(keyPath: PartialKeyPath<Base>) throws -> String {
@@ -70,12 +71,26 @@ extension <%= type.name %> {
 
         <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "String" { -%>
+        <%_ if variable.annotations["shift"] == nil { -%>
         self.<%= variable.name %> = try getOptionValue(keyPath: \Base.<%= variable.name %>)
+        <%_ } else { -%>
+        guard let shifted = parser.shift() else {
+            throw CommandError("Missing <%= variable.name %> parameter.")
+        }
+        self.<%= variable.name %> = shifted
+        <%_ } -%>
         <%_ } -%>
         <%_ } -%>
         <%_ for variable in type.storedVariables { -%>
         <%_ if variable.typeName.name == "String?" { -%>
-        self.<%= variable.name %> = try? getOptionValue(keyPath: \Base.<%= variable.name %>)
+        <%_ if variable.annotations["shift"] == nil { -%>
+        self.<%= variable.name %> = try getOptionValue(keyPath: \Base.<%= variable.name %>)
+        <%_ } else { -%>
+        guard let shifted = parser.shift() else {
+            throw CommandError("Missing <%= variable.name %> parameter.")
+        }
+        self.<%= variable.name %> = shifted
+        <%_ } -%>
         <%_ } -%>
         <%_ } -%>
         <%_ for variable in type.storedVariables { -%>
@@ -93,6 +108,7 @@ extension <%= type.name %> {
         <%_ } -%>
         <%_ } -%>
     }
+    <%_ } -%>
 }
 
 <%_ } -%>
