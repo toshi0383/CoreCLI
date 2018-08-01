@@ -6,6 +6,7 @@
 //
 
 public protocol AutoArgumentsDecodable {
+    static var defaultSubCommand: CommandType.Type? { get }
     static var subCommands: [CommandType.Type] { get }
     static var shortHandOptions: [PartialKeyPath<Self>: Character] { get }
     static var shortHandFlags: [KeyPath<Self, Bool>: Character] { get }
@@ -13,6 +14,7 @@ public protocol AutoArgumentsDecodable {
 }
 
 extension AutoArgumentsDecodable {
+    public static var defaultSubCommand: CommandType.Type? { return nil }
     public static var subCommands: [CommandType.Type] { return [] }
     public static var shortHandOptions: [PartialKeyPath<Self>: Character] { return [:] }
     public static var shortHandFlags: [KeyPath<Self, Bool>: Character] { return [:] }
