@@ -1,11 +1,7 @@
-//
-//  ArgumentParser.swift
-//  hackscode
-//
-//  Created by Toshihiro Suzuki on 2018/07/24.
-//
+import Foundation
 
 public protocol ArgumentParserType: class {
+    var executablePath: String { get }
     var remainder: [String] { get set }
     func getValue(forOption option: String) throws -> String
     func getFlag(_ flag: String) -> Bool
@@ -46,6 +42,8 @@ extension ArgumentParserType {
 /// Default ArgumentParser
 public final class ArgumentParser: ArgumentParserType {
 
+    public let executablePath: String
+
     public func getValue(forOption option: String) throws -> String {
 
         guard let index = remainder.index(of: option) else {
@@ -71,7 +69,12 @@ public final class ArgumentParser: ArgumentParserType {
     public var remainder: [String]
 
     /// - parameter arguments: ProcessInfo.processInfo.arguments
-    public init(arguments: [String]) {
-        self.remainder = arguments
+    public init(arguments: [String] = ProcessInfo.processInfo.arguments) {
+        if let first = arguments.first {
+            self.executablePath = first
+        } else {
+            fatalError("first argument is missing")
+        }
+        self.remainder = Array(arguments.dropFirst())
     }
 }
